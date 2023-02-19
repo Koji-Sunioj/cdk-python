@@ -1,3 +1,6 @@
+# Notes
+
+Project for learning to use Python with AWS-CDK and constructs such as Lambda, DynamoDB and ApiGateway
 
 # Welcome to your CDK Python project!
 
