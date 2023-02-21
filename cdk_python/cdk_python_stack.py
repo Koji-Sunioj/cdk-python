@@ -12,16 +12,21 @@ class CdkPythonStack(Stack):
     def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
-        table = dynamodb.Table(self, "ContractsTable",
+        contract_table = dynamodb.Table(self, "ContractsTable",
             partition_key=dynamodb.Attribute(name="contract_id", type=dynamodb.AttributeType.STRING))
+
+        shifts_table = dynamodb.Table(self, "ShiftsTable",
+            partition_key=dynamodb.Attribute(name="contract_id", type=dynamodb.AttributeType.STRING),
+            sort_key=dynamodb.Attribute(name="start_time", type=dynamodb.AttributeType.NUMBER))
 
         contracts_fn = lambda_fn.Function(self, "ContractsFunction",
             runtime=lambda_fn.Runtime.PYTHON_3_9,
             code=lambda_fn.Code.from_asset("lambda"),
             handler="contracts.handler",
-            environment={'DB_NAME': table.table_name})
+            environment={'CONTRACT_TABLE': contract_table.table_name,"SHIFTS_TABLE":shifts_table.table_name})
 
-        table.grant_read_write_data(contracts_fn)
+        contract_table.grant_read_write_data(contracts_fn)
+        shifts_table.grant_read_write_data(contracts_fn)
 
         contracts_endpoint = apigw.LambdaRestApi(
             self, 'ContractsEndpoint',
@@ -39,6 +44,12 @@ class CdkPythonStack(Stack):
         contract.add_method("DELETE")
         contract.add_method("PATCH")
 
+        shifts = contract.add_resource("shifts")
+        shifts.add_method("POST")
+        
+        shift = shifts.add_resource("{start_time}")
+        shift.add_method("DELETE")
+        shift.add_method("GET")
 
         plan = contracts_endpoint.add_usage_plan("UsagePlan",
             name="ContractApiPlan",
