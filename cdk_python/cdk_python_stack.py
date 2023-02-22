@@ -47,9 +47,10 @@ class CdkPythonStack(Stack):
         shifts = contract.add_resource("shifts")
         shifts.add_method("POST")
         
-        shift = shifts.add_resource("{start_time}")
-        shift.add_method("DELETE")
-        shift.add_method("GET")
+        start = shifts.add_resource("{start_time}")
+        end = start.add_resource("{end_time}")
+        end.add_method("DELETE")
+        end.add_method("GET")
 
         plan = contracts_endpoint.add_usage_plan("UsagePlan",
             name="ContractApiPlan",
