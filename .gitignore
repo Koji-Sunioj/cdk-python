@@ -4,7 +4,8 @@ __pycache__
 .pytest_cache
 .venv
 *.egg-info
-layer/
+layer/python/lib/python3.8/site-packages/*
+!layer/python/lib/python3.8/site-packages/requirements.txt
 
 # CDK asset staging directory
 .cdk.staging
