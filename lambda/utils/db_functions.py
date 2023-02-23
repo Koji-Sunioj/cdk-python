@@ -12,8 +12,8 @@ def get_contracts():
 
 
 def put_contract(contract):
-    response = contracts_table.put_item(Item=contract)
-    return response
+    table_response = contracts_table.put_item(Item=contract)
+    return table_response
 
 
 def get_contract(contract_id):
@@ -22,35 +22,33 @@ def get_contract(contract_id):
 
 
 def delete_contract(contract_id):
-    response = contracts_table.delete_item(Key={'contract_id': contract_id})
-    return response
+    table_response = contracts_table.delete_item(
+        Key={'contract_id': contract_id})
+    return table_response
 
 
 def patch_contract(contract):
-    response = contracts_table.update_item(Key={"contract_id": contract["contract_id"]},
-                                           UpdateExpression="set base_pay=:base_pay, title=:title",
-                                           ExpressionAttributeValues={":base_pay": contract["base_pay"],
-                                           ":title": contract["title"]}, ReturnValues="ALL_NEW")
-    return response
+    args = dict(Key={"contract_id": contract["contract_id"]},
+                UpdateExpression="set base_pay=:base_pay, title=:title",
+                ExpressionAttributeValues={":base_pay": contract["base_pay"],
+                ":title": contract["title"]}, ReturnValues="ALL_NEW")
+
+    table_response = contracts_table.update_item(**args)
+    return table_response
 
 
 def put_shifts(contract_id, shifts):
-    try:
-        with shifts_table.batch_writer() as batch:
-            for shift in shifts:
-                shift["contract_id"] = contract_id
-                batch.put_item(Item=shift)
-        response_code = 200
-    except:
-        response_code = 400
-    response = {"ResponseMetadata": {"HTTPStatusCode": response_code}}
-    return response
+    with shifts_table.batch_writer() as batch:
+        for shift in shifts:
+            shift["contract_id"] = contract_id
+            batch.put_item(Item=shift)
 
 
 def get_shifts(contract_id, start_time, end_time=None):
-    args = dict(KeyConditionExpression="contract_id=:contract_id AND start_time>=:start_time",
-                ProjectionExpression="start_time,end_time",
-                ExpressionAttributeValues={":contract_id": contract_id, ":start_time": start_time})
+    args = dict(KeyConditionExpression="contract_id=:contract_id AND \
+                start_time>=:start_time", ProjectionExpression="start_time,\
+                end_time", ExpressionAttributeValues={":contract_id":
+                contract_id, ":start_time": start_time})
 
     if end_time != None:
         args["FilterExpression"] = "end_time<=:end_time"
@@ -61,13 +59,8 @@ def get_shifts(contract_id, start_time, end_time=None):
 
 
 def delete_shifts(contract_id, shifts):
-    try:
-        with shifts_table.batch_writer() as batch:
-            for shift in shifts:
-                shifts_table.delete_item(
-                    Key={"contract_id": contract_id, "start_time": int(shift["start_time"])})
-        response_code = 200
-    except:
-        response_code = 400
-    response = {"ResponseMetadata": {"HTTPStatusCode": response_code}}
-    return response
+    with shifts_table.batch_writer() as batch:
+        for shift in shifts:
+            args = {"contract_id": contract_id, "start_time":
+                    int(shift["start_time"])}
+            shifts_table.delete_item(Key=args)
