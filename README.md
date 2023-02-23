@@ -2,7 +2,7 @@
 
 Project for learning to use Python with AWS-CDK and constructs such as Lambda, DynamoDB and ApiGateway
 
-There is a a folder called "layer" with requirements.txt in it. I did this so I can have the lambda layer dependencies in my repository without pushing all the installed modules to github. If you want to install those dependencies, you would need to navigate to cdk-python/layer/python/lib/python3.8/site-packages and run:
+There is a a folder called "layer" with requirements.txt in it. I did this so I can access external modules in my lambda function,and  have the lambda layer dependencies in my repository without pushing all the installed modules to github. If you want to install those dependencies, you would need to navigate to cdk-python/layer/python/lib/python3.8/site-packages and run:
 
 ```
 python3 -m venv .venv 
@@ -10,6 +10,10 @@ source .venv/bin/activate
 pip install requirements.txt -r
 deactivate
 ``` 
+
+There are other ways to access and install external modules in lambda, such as with bundling a docker image with scripts in the AWS CDK construct. However, the package installation runs when I run "cdk deploy --hotswap" to change some code in the lambda function, even though I did not change any AWS resource.
+
+
 
 # Welcome to your CDK Python project!
 
