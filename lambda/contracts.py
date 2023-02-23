@@ -6,8 +6,20 @@ from utils.db_functions import (
 from utils.utils import (
     serialize_float, serialize_int, epoch_to_date, check_response)
 
+import pandas as pd
+import numpy as np
+
 
 def handler(event, context):
+
+    mydataset = {
+        'cars': ["BMW", "Volvo", "Ford"],
+        'passings': [3, 7, 2]
+    }
+
+    myvar = pd.DataFrame(mydataset)
+
+    print(myvar)
 
     params = event["pathParameters"]
     if params != None and "contract_id" in params:
