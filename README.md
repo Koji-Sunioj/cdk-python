@@ -11,7 +11,7 @@ mkdir -p layer/python/lib/python3.8/site-packages/
 pip install --target=/home/koji/Desktop/devops/cdk-python/layer pandas
 ``` 
 
-There are other ways to access and install external modules in lambda, such as with bundling a docker image with scripts in the AWS CDK construct. However, the package installation runs when I run "cdk deploy --hotswap" to change some code in the lambda function, even though I did not change any AWS resource.
+There are other ways to access and install external modules in lambda, such as with bundling a docker image with scripts in the AWS CDK construct. However,the installation scripts in that image runs whenever "cdk deploy --hotswap" is initiated (to change some code in the lambda function), even though no resources in the stack were manipulated.
 
 
 
