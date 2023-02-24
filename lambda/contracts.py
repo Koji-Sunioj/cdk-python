@@ -13,7 +13,7 @@ import numpy as np
 def handler(event, context):
 
     mydataset = {
-        'cars': ["BMW", "Volvo", "Ford"],
+        'cars': ["BMW", "Hey", "Ford"],
         'passings': [3, 7, 2]
     }
 

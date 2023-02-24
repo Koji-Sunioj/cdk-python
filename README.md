@@ -2,16 +2,16 @@
 
 Project for learning to use Python with AWS-CDK and constructs such as Lambda, DynamoDB and ApiGateway
 
-The contstruct includes a lambda layer which does not appear in github, this is because it is a directory full of python packages. AWS Lambda layer only accepts the path python/ and python/lib/python3.8/site-packages for the lambda function to access. I would have liked to just have a requirements.txt file which can be installed if the repo is forked - but the path becomes different when installing from a virtual environment. It also becomes too large to upload. 
+The contstruct includes a lambda layer which does not appear in github, this is because it is a directory full of python packages. AWS Lambda layer only accepts the path python/ and python/lib/python3.8/site-packages (note python3.8 in file path should be the same for both your system and the lambda) for the lambda function to access. I would have liked to just have a requirements.txt file which can be installed if the repo is forked - but the path becomes different when installing from a virtual environment. It also becomes too large to upload. 
 
 To create the packages for the layer, which the construct accepts, run these commands (inside the root of the project folder):
 
 ```
 mkdir -p layer/python/lib/python3.8/site-packages/
-pip install --target=/home/koji/Desktop/devops/cdk-python/layer pandas
+pip install --target=layer/python/lib/python3.8/site-packages/ pandas
 ``` 
 
-There are other ways to access and install external modules in lambda, such as with bundling a docker image with scripts in the AWS CDK construct. However,the installation scripts in that image runs whenever "cdk deploy --hotswap" is initiated (to change some code in the lambda function), even though no resources in the stack were manipulated.
+There are other ways to access and install external modules in lambda, such as with bundling a docker image with scripts in the AWS CDK construct or using the expiremental PythonFunction construct. However,the installation scripts in that image and PythonFunction run whenever "cdk deploy --hotswap" is initiated (to change some code in the lambda function), even though no resources in the stack were manipulated.
 
 
 

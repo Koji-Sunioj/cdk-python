@@ -2,7 +2,7 @@ from aws_cdk import (
     aws_dynamodb as dynamodb,
     aws_lambda as lambda_fn,
     aws_apigateway as apigw,
-    Stack
+    Stack,
 )
 import aws_cdk as core
 
