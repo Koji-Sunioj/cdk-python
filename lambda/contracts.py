@@ -11,22 +11,14 @@ import numpy as np
 
 
 def handler(event, context):
-
-    mydataset = {
-        'cars': ["BMW", "Hey", "Ford"],
-        'passings': [3, 7, 2]
-    }
-
-    myvar = pd.DataFrame(mydataset)
-
-    print(myvar)
-
     params = event["pathParameters"]
     if params != None and "contract_id" in params:
         contract_id = params["contract_id"]
     route_key = "%s %s" % (event["resource"], event["httpMethod"])
     response = {"statusCode": 200, "headers": {
         "Content-Type": "application/json"}, "body": {}}
+
+    print(route_key)
 
     try:
         if route_key == "/contracts GET":
@@ -92,6 +84,25 @@ def handler(event, context):
             shifts = get_shifts(contract_id, start_time, end_time)
             response["body"] = json.dumps(
                 {"shifts": shifts}, default=serialize_int)
+        elif (route_key == "/aggregate-contract/{contract_id} GET"):
+            contract = get_contract(contract_id)
+            shifts = get_shifts(contract_id, 0)
+            days = pd.DataFrame(shifts)
+            days = days[['start_time', 'end_time']].astype(int)
+            for column in days.columns:
+                days[column] = pd.to_datetime(days[column], unit='s').dt.tz_localize(
+                    'UTC').dt.tz_convert(contract["time_zone"]).dt.tz_localize(None)
+            days["hours"] = (days["end_time"] -
+                             days["start_time"]).astype('timedelta64[h]')
+            days["wages"] = days["hours"] * float(contract["base_pay"])
+            days.index = days["start_time"].dt.normalize()
+            wages = days[["wages"]].resample(contract["pay_date"]).sum()
+            wages = wages.reset_index()
+            wages["start_time"] = wages.start_time.astype(str)
+            table = wages.rename(columns={"start_time": "pay period"}).round(
+                2).to_dict("records")
+            response["body"] = json.dumps(
+                {"data": table}, default=serialize_float)
 
         else:
             response["statusCode"] = 404

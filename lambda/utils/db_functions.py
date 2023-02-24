@@ -6,7 +6,7 @@ contracts_table = dynamodb.Table(os.environ['CONTRACT_TABLE'])
 shifts_table = dynamodb.Table(os.environ['SHIFTS_TABLE'])
 
 
-def get_contracts():
+def get_contracts(params=None):
     contracts = contracts_table.scan()
     return contracts["Items"]
 
@@ -29,9 +29,11 @@ def delete_contract(contract_id):
 
 def patch_contract(contract):
     args = dict(Key={"contract_id": contract["contract_id"]},
-                UpdateExpression="set base_pay=:base_pay, title=:title",
+                UpdateExpression="set base_pay=:base_pay, title=:title,\
+                pay_date=:pay_date, time_zone=:time_zone",
                 ExpressionAttributeValues={":base_pay": contract["base_pay"],
-                ":title": contract["title"]}, ReturnValues="ALL_NEW")
+                ":title": contract["title"], ":pay_date": contract["pay_date"],
+                ":time_zone": contract["time_zone"]}, ReturnValues="ALL_NEW")
 
     table_response = contracts_table.update_item(**args)
     return table_response

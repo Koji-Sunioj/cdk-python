@@ -72,12 +72,14 @@ class CdkPythonStack(Stack):
         end.add_method("DELETE")
         end.add_method("GET")
 
-        aggregate = contracts_endpoint.root.add_resource("aggregate")
-        user_aggregate = aggregate.add_resource("{user_name}")
-        user_aggregate.add_method("GET")
+        user_aggregate = contracts_endpoint.root.add_resource("aggregate-user")
+        user_wages = user_aggregate.add_resource("{user_name}")
+        user_wages.add_method("GET")
 
-        contract_aggregate = user_aggregate.add_resource("{contract_id}")
-        contract_aggregate.add_method("GET")
+        contract_aggregate = contracts_endpoint.root.add_resource(
+            "aggregate-contract")
+        contract_wages = contract_aggregate.add_resource("{contract_id}")
+        contract_wages.add_method("GET")
 
         plan = contracts_endpoint.add_usage_plan(
             "UsagePlan", name="ContractApiPlan",
